@@ -1,0 +1,235 @@
+/* ==========================================================================
+   1. VARIABLES Y ESTILOS BASE (Pastelería Mishky)
+   ========================================================================== */
+:root {
+  --cacao: #6b4433;
+  --chocolate: #4a2c2a;
+  --crema-1: #faf6f0;
+  --crema-2: #f6eadb;
+  --dorado: #c8963e;
+  --blanco: #ffffff;
+  --texto: #2c2523;
+  --radio: 14px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Nunito', system-ui, sans-serif;
+  background-color: var(--crema-1);
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+.contenedor {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Header & Nav */
+.cabecera {
+  background-color: var(--blanco);
+  border-bottom: 1px solid var(--crema-2);
+  padding: 1rem 0;
+}
+.cabecera_fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.marca img {
+  display: block;
+  height: auto;
+}
+.menu {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu a {
+  text-decoration: none;
+  color: var(--chocolate);
+  font-weight: 700;
+}
+
+/* Hero Section */
+.hero {
+  background-color: var(--crema-2);
+  padding: 3rem 0;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.hero_antetitulo {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--cacao);
+  font-weight: 700;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: var(--chocolate);
+  margin: 0.5rem 0;
+}
+
+/* Titulares y Filtros */
+.titulo-seccion {
+  font-family: 'Playfair Display', serif;
+  color: var(--chocolate);
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filtro {
+  background: var(--blanco);
+  border: 2px solid var(--crema-2);
+  color: var(--cacao);
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtro[aria-pressed="true"], .filtro:hover {
+  background: var(--cacao);
+  color: var(--blanco);
+  border-color: var(--cacao);
+}
+
+.estado {
+  font-weight: 600;
+  color: var(--cacao);
+  margin-bottom: 1.5rem;
+}
+.estado--error {
+  color: #a3202f;
+  background: #fde8e8;
+  padding: 1rem;
+  border-radius: var(--radio);
+}
+
+/* ==========================================================================
+   2. CONTROLES AVANZADOS Y LAYOUT DE GRILLA
+   ========================================================================== */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); border: 0;
+}
+
+.panel-controles {
+  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+  justify-content: space-between; background: var(--blanco);
+  padding: 1rem 1.2rem; border-radius: var(--radio);
+  box-shadow: 0 4px 12px rgba(74, 44, 42, 0.06); margin-bottom: 1.5rem;
+}
+.control-busqueda { flex: 1 1 220px; }
+.control-busqueda input[type="search"] {
+  width: 100%; padding: 0.6rem 1rem; border: 2px solid var(--crema-2);
+  border-radius: 999px; font: inherit; color: var(--chocolate);
+}
+.control-orden { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+.control-orden select {
+  padding: 0.55rem 1rem; border-radius: 999px; border: 2px solid var(--cacao);
+  background: transparent; color: var(--cacao); font: inherit; cursor: pointer;
+}
+.checkbox-container { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; cursor: pointer; }
+
+/* Grilla Responsiva */
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.8rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 3rem 0;
+}
+
+/* Tarjeta */
+.tarjeta {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tarjeta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(74, 44, 42, 0.12);
+}
+.tarjeta--agotado { opacity: 0.75; filter: grayscale(0.8); }
+
+.tarjeta-btn-detalle {
+  background: none; border: none; padding: 0; margin: 0; font: inherit;
+  color: inherit; text-align: left; width: 100%; height: 100%; cursor: pointer;
+  display: flex; flex-direction: column;
+}
+
+.tarjeta_foto {
+  position: relative; margin: 0; aspect-ratio: 1/1; overflow: hidden; background: var(--crema-2);
+}
+.tarjeta_foto img {
+  width: 100%; height: 100%; object-fit: cover; opacity: 0;
+  transition: opacity 0.4s ease, transform 0.3s ease;
+}
+.tarjeta_foto img.foto-cargada { opacity: 1; }
+
+.etiqueta {
+  position: absolute; top: 12px; right: 12px; background: var(--dorado);
+  color: var(--blanco); font-size: 0.75rem; font-weight: 700;
+  padding: 0.25rem 0.6rem; border-radius: 999px; text-transform: uppercase;
+}
+.etiqueta--agotado { background: #a3202f; }
+
+.tarjeta_cuerpo { padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1; }
+.tarjeta_categoria { font-size: 0.8rem; font-weight: 700; color: var(--cacao); text-transform: uppercase; margin: 0 0 0.3rem 0; }
+.tarjeta_nombre { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--chocolate); margin: 0 0 0.5rem 0; }
+.tarjeta_descripcion { font-size: 0.9rem; color: #666; margin: 0 0 1rem 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tarjeta_pie { margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--crema-2); padding-top: 0.8rem; }
+.tarjeta_precio { font-weight: 700; font-size: 1.1rem; color: var(--chocolate); }
+.tarjeta_porciones { font-size: 0.8rem; color: #888; }
+
+/* Skeletons */
+.tarjeta--skeleton { pointer-events: none; }
+.skeleton-foto { width: 100%; aspect-ratio: 1/1; background: #e8ded1; }
+.skeleton-linea { height: 12px; background: #e8ded1; margin-bottom: 8px; border-radius: 4px; }
+.skeleton-linea.corta { width: 35%; }
+.skeleton-linea.larga { width: 85%; }
+.skeleton-linea.media { width: 60%; }
+.skeleton-pie { height: 20px; background: #e8ded1; margin-top: 10px; border-radius: 4px; }
+.pulse { animation: pulseAnim 1.4s infinite ease-in-out; }
+@keyframes pulseAnim { 0% { opacity: 0.4; } 50% { opacity: 0.9; } 100% { opacity: 0.4; } }
+
+/* Footer */
+.pie { background: var(--chocolate); color: var(--crema-1); padding: 2rem 0; text-align: center; font-size: 0.9rem; }
+.pie p { margin: 0.3rem 0 0 0; opacity: 0.8; }
+
+/* Modal Nativo (<dialog>) */
+.modal-producto { border: none; border-radius: 16px; padding: 0; max-width: 600px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.modal-producto::backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px); }
+.modal-contenido { position: relative; padding: 1.5rem; background: var(--blanco); border-radius: 16px; }
+.modal-cerrar { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2rem; color: var(--chocolate); cursor: pointer; }
+.modal-cuerpo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: center; }
+@media (max-width: 550px) { .modal-cuerpo { grid-template-columns: 1fr; } }
+.modal-foto-wrapper { position: relative; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; }
+.modal-foto-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.modal-titulo { font-family: "Playfair Display", serif; font-size: 1.4rem; color: var(--chocolate); margin: 0.4rem 0; }
+.modal-detalles { display: flex; justify-content: space-between; align-items: center; margin: 1rem 0; }
+.modal-stock-info { font-size: 0.9rem; font-weight: 700; color: var(--cacao); }

@@ -1,0 +1,35 @@
+[
+{
+"id": 1,
+"nombre": "Torta de chocolate húmeda",
+"categoria": "Tortas",
+"descripcion": "Bizcocho de cacao peruano al 70 % relleno y cubierto con fudge de chocolate.",
+"precio": 89.9,
+"porciones": 16,
+"imagen": "img/productos/torta-chocolate.jpg",
+"stock": 6,
+"destacado": true
+},
+{
+"id": 2,
+"nombre": "Torta selva negra",
+"categoria": "Tortas",
+"descripcion": "Capas de chocolate, crema chantilly y cerezas al marrasquino.",
+"precio": 92.0,
+"porciones": 16,
+"imagen": "img/productos/torta-selva-negra.jpg",
+"stock": 4,
+"destacado": false
+},
+{
+"id": 5,
+"nombre": "Suspiro a la limeña",
+"categoria": "Postres peruanos",
+"descripcion": "Manjar blanco de yemas coronado con merengue al oporto y canela.",
+"precio": 12.5,
+"porciones": 1,
+"imagen": "img/productos/suspiro-limena.jpg",
+"stock": 20,
+"destacado": true
+}
+]

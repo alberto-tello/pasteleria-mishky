@@ -25,11 +25,6 @@
                 <ul class="menu">
                     <li><a href="catalogo.html" aria-current="page">Catálogo</a></li>
                     <li><a href="#contacto">Contacto</a></li>
-                    <li>
-                        <button type="button" id="btn-abrir-carrito" class="btn-carrito-nav">
-                            Carrito (<span id="carrito-contador">0</span>)
-                        </button>
-                    </li>
                 </ul>
             </nav>
         </div>
@@ -57,7 +52,6 @@
                 <label for="orden">Ordenar por:</label>
                 <select id="orden">
                     <option value="predeterminado">Predeterminado</option>
-                    <option value="favoritos">Mis favoritos</option>
                     <option value="precio-asc">Menor precio</option>
                     <option value="precio-desc">Mayor precio</option>
                     <option value="nombre-asc">Nombre A–Z</option>
@@ -75,9 +69,6 @@
 
         <!-- ESTADO DE LA INTERFAZ -->
         <div id="estado" class="estado" role="status" aria-live="polite"></div>
-
-        <!-- AVISO TEMPORAL DEL CARRITO -->
-        <p id="aviso-carrito" class="aviso-carrito" role="status" aria-live="polite" hidden></p>
 
         <!-- GRILLA CON SKELETONS INICIALES -->
         <ul id="grilla" class="grilla" aria-busy="true">
@@ -122,27 +113,25 @@
         </div>
     </footer>
 
-   <!-- PLANTILLA DE TARJETA -->
-   <template id="plantilla-tarjeta">
-    <li class="tarjeta">
-        <figure class="tarjeta_foto">
-            <!-- AGREGAR ESTE BOTÓN -->
-            <button type="button" class="btn-favorito" aria-label="Marcar como favorito" aria-pressed="false">🤍</button>
-            <span class="etiqueta" hidden></span>
-            <img src="" alt="" loading="lazy" decoding="async">
-        </figure>
-        <div class="tarjeta_cuerpo">
-            <p class="tarjeta_categoria"></p>
-            <h3 class="tarjeta_nombre"></h3>
-            <p class="tarjeta_descripcion"></p>
-            <div class="tarjeta_pie">
-                <span class="tarjeta_precio"></span>
-                <span class="tarjeta_porciones"></span>
+    <!-- PLANTILLA DE TARJETA -->
+    <template id="plantilla-tarjeta">
+        <li class="tarjeta">
+            <figure class="tarjeta_foto">
+                <span class="etiqueta" hidden></span>
+                <img src="" alt="" loading="lazy" decoding="async">
+            </figure>
+            <div class="tarjeta_cuerpo">
+                <p class="tarjeta_categoria"></p>
+                <h3 class="tarjeta_nombre"></h3>
+                <p class="tarjeta_descripcion"></p>
+                <div class="tarjeta_pie">
+                    <span class="tarjeta_precio"></span>
+                    <span class="tarjeta_porciones"></span>
+                </div>
             </div>
-            <button type="button" class="btn-agregar">Agregar al carrito</button>
-        </div>
-    </li>
-</template>
+        </li>
+    </template>
+
     <!-- MODAL DIALOG -->
     <dialog id="modal-producto" class="modal">
         <div class="modal_contenido">
@@ -154,28 +143,9 @@
                 <p id="modal-descripcion"></p>
                 <p id="modal-precio" class="tarjeta_precio"></p>
                 <p id="modal-stock"></p>
-                <!-- AGREGAR ESTE BOTÓN -->
-                <button type="button" id="btn-modal-favorito" class="btn-modal-fav" aria-pressed="false">
-                    🤍 Guardar en mis favoritos
-                </button>
             </div>
         </div>
     </dialog>
-    <!-- PANEL DEL CARRITO -->
-    <aside id="panel-carrito" class="carrito-panel" aria-label="Carrito de compras" hidden>
-        <div class="carrito-cabecera">
-            <h3>Tu carrito</h3>
-            <button type="button" id="btn-cerrar-carrito" aria-label="Cerrar carrito">&times;</button>
-        </div>
-        <ul id="carrito-items" class="carrito-items"></ul>
-        <div class="carrito-pie">
-            <p class="carrito-cantidad">Cantidad total: <strong id="carrito-cantidad-total">0</strong></p>
-            <p class="carrito-total">Total a pagar: <strong id="carrito-total">S/ 0.00</strong></p>
-            <div class="carrito-acciones">
-                <button type="button" id="btn-vaciar-carrito" class="btn-secundario">Vaciar carrito</button>
-            </div>
-        </div>
-    </aside>
 
     <script src="js/catalogo.js"></script>
 </body>

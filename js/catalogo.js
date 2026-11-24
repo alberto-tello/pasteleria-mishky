@@ -1,20 +1,11 @@
 const TODOS = "Todas";
-const CAT_FAVORITOS = "Mis favoritos";
-const CLAVE_CARRITO = "mishky_carrito_v1";
-const CLAVE_FAVORITOS = "mishky_favoritos_v1";
-
 let productos = [];
 let categoriaActiva = TODOS;
 let ultimoElementoFocado = null;
-let productoModalActualId = null;
-let carrito = cargarCarrito();
-let favoritos = cargarFavoritos();
-let temporizadorAviso = null;
 
 // Referencias al DOM
 const grilla = document.getElementById("grilla");
 const estado = document.getElementById("estado");
-const avisoCarrito = document.getElementById("aviso-carrito");
 const contFiltros = document.getElementById("filtros");
 const buscador = document.getElementById("buscador");
 const ordenSelect = document.getElementById("orden");
@@ -30,64 +21,10 @@ const modalDescripcion = document.getElementById("modal-descripcion");
 const modalPrecio = document.getElementById("modal-precio");
 const modalStock = document.getElementById("modal-stock");
 const btnCerrarModal = document.getElementById("btn-cerrar-modal");
-const btnModalFavorito = document.getElementById("btn-modal-favorito");
-
-// Referencias Carrito
-const btnAbrirCarrito = document.getElementById("btn-abrir-carrito");
-const btnCerrarCarrito = document.getElementById("btn-cerrar-carrito");
-const panelCarrito = document.getElementById("panel-carrito");
-const listaCarritoEl = document.getElementById("carrito-items");
-const cantidadTotalEl = document.getElementById("carrito-cantidad-total");
-const totalCarritoEl = document.getElementById("carrito-total");
-const contadorCarritoEl = document.getElementById("carrito-contador");
-const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
 
 const formatearSoles = (monto) =>
   new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(monto);
 
-// --- GESTIÓN DE FAVORITOS ---
-function cargarFavoritos() {
-  try {
-    const guardado = JSON.parse(localStorage.getItem(CLAVE_FAVORITOS));
-    return Array.isArray(guardado) ? new Set(guardado.map(Number)) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function guardarFavoritos() {
-  localStorage.setItem(CLAVE_FAVORITOS, JSON.stringify([...favoritos]));
-}
-
-function alternarFavorito(idProducto) {
-  const id = Number(idProducto);
-  const prod = productos.find((p) => p.id === id);
-  if (!prod) return;
-
-  if (favoritos.has(id)) {
-    favoritos.delete(id);
-    mostrarAvisoCarrito(`Quitaste «${prod.nombre}» de tus favoritos.`);
-  } else {
-    favoritos.add(id);
-    mostrarAvisoCarrito(`Guardaste «${prod.nombre}» en tus favoritos ❤️.`);
-  }
-
-  guardarFavoritos();
-  renderizarCatalogo();
-
-  if (productoModalActualId === id) {
-    actualizarBotonModalFavorito(id);
-  }
-}
-
-function actualizarBotonModalFavorito(id) {
-  if (!btnModalFavorito) return;
-  const esFav = favoritos.has(Number(id));
-  btnModalFavorito.setAttribute("aria-pressed", String(esFav));
-  btnModalFavorito.textContent = esFav ? "❤️ Quitar de mis favoritos" : "🤍 Guardar en mis favoritos";
-}
-
-// --- CARGA Y VALIDACIÓN ---
 function validarProducto(p) {
   const extensionesValidas = /\.(jpg|jpeg|png|webp|svg)$/i;
   const esIdValido = typeof p.id === "number" && p.id > 0;
@@ -125,7 +62,7 @@ async function cargarProductos() {
 
 function obtenerCategorias(lista) {
   const cats = new Set(lista.map((p) => p.categoria));
-  return [TODOS, CAT_FAVORITOS, ...Array.from(cats)];
+  return [TODOS, ...Array.from(cats)];
 }
 
 function renderizarFiltros(categorias) {
@@ -154,19 +91,13 @@ function actualizarContadores() {
   botones.forEach((btn) => {
     const cat = btn.dataset.categoria;
     const conteo = productos.filter((p) => {
-      let coincideCat = true;
-      if (cat === CAT_FAVORITOS) {
-        coincideCat = favoritos.has(p.id);
-      } else if (cat !== TODOS) {
-        coincideCat = p.categoria === cat;
-      }
-
+      const coincideCat = cat === TODOS || p.categoria === cat;
       const coincideNombre = p.nombre.toLowerCase().includes(textoBusqueda);
       const coincideStock = !soloDisponibles || p.stock > 0;
       return coincideCat && coincideNombre && coincideStock;
     }).length;
 
-    btn.textContent = cat === CAT_FAVORITOS ? `❤️ ${cat} (${conteo})` : `${cat} (${conteo})`;
+    btn.textContent = `${cat} (${conteo})`;
   });
 }
 
@@ -174,27 +105,15 @@ function crearTarjeta(p) {
   const clon = plantilla.content.cloneNode(true);
   const li = clon.querySelector(".tarjeta");
   const img = clon.querySelector(".tarjeta_foto img");
-  const btnFav = clon.querySelector(".btn-favorito");
   const etiqueta = clon.querySelector(".etiqueta");
   const catTxt = clon.querySelector(".tarjeta_categoria");
   const nomTxt = clon.querySelector(".tarjeta_nombre");
   const descTxt = clon.querySelector(".tarjeta_descripcion");
   const precioTxt = clon.querySelector(".tarjeta_precio");
   const porcTxt = clon.querySelector(".tarjeta_porciones");
-  const btnAdd = clon.querySelector(".btn-agregar");
 
   li.dataset.id = p.id;
   li.tabIndex = 0;
-
-  if (btnFav) {
-    const esFav = favoritos.has(p.id);
-    btnFav.textContent = esFav ? "❤️" : "🤍";
-    btnFav.setAttribute("aria-pressed", String(esFav));
-    btnFav.setAttribute(
-      "aria-label",
-      esFav ? `Quitar ${p.nombre} de favoritos` : `Marcar ${p.nombre} como favorito`
-    );
-  }
 
   img.src = p.imagen;
   img.srcset = `${p.imagen} 1x, ${p.imagen} 2x`;
@@ -203,14 +122,14 @@ function crearTarjeta(p) {
 
   img.addEventListener("load", () => img.classList.add("foto-cargada"));
 
-  if (p.stock === 0) {
+  if (p.destacado) {
+    etiqueta.textContent = "Favorito";
+    etiqueta.hidden = false;
+  } else if (p.stock === 0) {
     etiqueta.textContent = "Agotado";
     etiqueta.classList.add("etiqueta--agotado");
     etiqueta.hidden = false;
     li.classList.add("tarjeta--agotado");
-  } else if (p.destacado) {
-    etiqueta.textContent = "Favorito";
-    etiqueta.hidden = false;
   }
 
   catTxt.textContent = p.categoria;
@@ -219,41 +138,23 @@ function crearTarjeta(p) {
   precioTxt.textContent = formatearSoles(p.precio);
   porcTxt.textContent = p.porciones ? `${p.porciones} porciones` : "1 unidad";
 
-  if (p.stock === 0) {
-    btnAdd.disabled = true;
-    btnAdd.textContent = "Agotado";
-  }
-
   return clon;
 }
 
 function renderizarCatalogo() {
   grilla.setAttribute("aria-busy", "true");
 
-  const tipoOrden = ordenSelect.value;
-
   let lista = productos.filter((p) => {
-    let coincideCat = true;
-    if (categoriaActiva === CAT_FAVORITOS || tipoOrden === "favoritos") {
-      coincideCat = favoritos.has(p.id);
-    } else if (categoriaActiva !== TODOS) {
-      coincideCat = p.categoria === categoriaActiva;
-    }
-
+    const coincideCat = categoriaActiva === TODOS || p.categoria === categoriaActiva;
     const coincideBusqueda = p.nombre.toLowerCase().includes(buscador.value.trim().toLowerCase());
     const coincideStock = !chkDisponibles.checked || p.stock > 0;
     return coincideCat && coincideBusqueda && coincideStock;
   });
 
+  const tipoOrden = ordenSelect.value;
   const copia = lista.slice();
 
-  if (tipoOrden === "favoritos") {
-    copia.sort((a, b) => {
-      const favA = favoritos.has(a.id) ? 1 : 0;
-      const favB = favoritos.has(b.id) ? 1 : 0;
-      return favB - favA;
-    });
-  } else if (tipoOrden === "precio-asc") {
+  if (tipoOrden === "precio-asc") {
     copia.sort((a, b) => a.precio - b.precio);
   } else if (tipoOrden === "precio-desc") {
     copia.sort((a, b) => b.precio - a.precio);
@@ -264,10 +165,7 @@ function renderizarCatalogo() {
   grilla.replaceChildren();
 
   if (copia.length === 0) {
-    estado.textContent =
-      categoriaActiva === CAT_FAVORITOS || tipoOrden === "favoritos"
-        ? "Aún no has marcado productos en tus favoritos."
-        : "No hay productos que coincidan con los filtros.";
+    estado.textContent = "No hay productos que coincidan con los filtros.";
     grilla.removeAttribute("aria-busy");
     actualizarContadores();
     return;
@@ -279,12 +177,7 @@ function renderizarCatalogo() {
   grilla.replaceChildren(fragmento);
   grilla.removeAttribute("aria-busy");
 
-  const filtroTexto =
-    tipoOrden === "favoritos"
-      ? "«Mis favoritos»"
-      : categoriaActiva === TODOS
-        ? "todas las categorías"
-        : `«${categoriaActiva}»`;
+  const filtroTexto = categoriaActiva === TODOS ? "todas las categorías" : `«${categoriaActiva}»`;
   estado.textContent = `Mostrando ${copia.length} productos en ${filtroTexto}.`;
 
   actualizarContadores();
@@ -327,7 +220,6 @@ function abrirModal(idProducto, elementoOrigen) {
   if (!p) return;
 
   ultimoElementoFocado = elementoOrigen;
-  productoModalActualId = p.id;
 
   modalImg.src = p.imagen;
   modalImg.alt = p.nombre;
@@ -337,156 +229,16 @@ function abrirModal(idProducto, elementoOrigen) {
   modalPrecio.textContent = formatearSoles(p.precio);
   modalStock.textContent = p.stock > 0 ? `Stock disponible: ${p.stock} unidades` : "Agotado por el momento";
 
-  actualizarBotonModalFavorito(p.id);
   modal.showModal();
 }
 
 function cerrarModal() {
   modal.close();
-  productoModalActualId = null;
   if (ultimoElementoFocado) {
     ultimoElementoFocado.focus();
   }
 }
 
-// --- CARRITO DE COMPRAS (CANTIDAD + TOTAL) ---
-function limpiarAvisoCarrito() {
-  clearTimeout(temporizadorAviso);
-  if (!avisoCarrito) return;
-  avisoCarrito.textContent = "";
-  avisoCarrito.hidden = true;
-}
-
-function mostrarAvisoCarrito(mensaje) {
-  if (!avisoCarrito) return;
-  clearTimeout(temporizadorAviso);
-  avisoCarrito.textContent = mensaje;
-  avisoCarrito.hidden = false;
-  temporizadorAviso = setTimeout(() => {
-    limpiarAvisoCarrito();
-  }, 2500);
-}
-
-function cargarCarrito() {
-  try {
-    const guardado = JSON.parse(localStorage.getItem(CLAVE_CARRITO));
-    return Array.isArray(guardado) ? guardado : [];
-  } catch {
-    return [];
-  }
-}
-
-function guardarCarrito() {
-  localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito));
-}
-
-function agregarAlCarrito(idProducto) {
-  const prod = productos.find((p) => p.id === Number(idProducto));
-  if (!prod || prod.stock <= 0) {
-    mostrarAvisoCarrito("Este producto está agotado por el momento.");
-    return;
-  }
-
-  const existente = carrito.find((item) => item.id === prod.id);
-  const cantActual = existente ? existente.cantidad : 0;
-
-  if (cantActual >= prod.stock) {
-    mostrarAvisoCarrito(`Solo hay ${prod.stock} unidades disponibles de «${prod.nombre}».`);
-    return;
-  }
-
-  if (existente) {
-    existente.cantidad += 1;
-  } else {
-    carrito.push({ id: prod.id, cantidad: 1 });
-  }
-
-  guardarCarrito();
-  renderizarCarrito();
-  mostrarAvisoCarrito(`Agregaste «${prod.nombre}» al carrito.`);
-}
-
-function cambiarCantidad(idProducto, delta) {
-  const idx = carrito.findIndex((item) => item.id === Number(idProducto));
-  if (idx === -1) return;
-
-  const prod = productos.find((p) => p.id === Number(idProducto));
-  const nuevaCant = carrito[idx].cantidad + delta;
-
-  if (nuevaCant <= 0) {
-    carrito.splice(idx, 1);
-  } else if (prod && nuevaCant > prod.stock) {
-    mostrarAvisoCarrito(`Máximo disponible: ${prod.stock} unidades.`);
-    return;
-  } else {
-    carrito[idx].cantidad = nuevaCant;
-  }
-
-  guardarCarrito();
-  renderizarCarrito();
-}
-
-function renderizarCarrito() {
-  let totalUnidades = 0;
-  let totalMonto = 0;
-
-  listaCarritoEl.replaceChildren();
-
-  carrito.forEach((item) => {
-    const prod = productos.find((p) => p.id === item.id);
-    if (!prod) return;
-
-    const subtotal = prod.precio * item.cantidad;
-    totalUnidades += item.cantidad;
-    totalMonto += subtotal;
-
-    const li = document.createElement("li");
-    li.className = "carrito-item";
-
-    const infoDiv = document.createElement("div");
-    const nombreStrong = document.createElement("strong");
-    nombreStrong.textContent = prod.nombre;
-    const detalleDiv = document.createElement("div");
-    detalleDiv.textContent = `${formatearSoles(prod.precio)} c/u · Subtotal: ${formatearSoles(subtotal)}`;
-    infoDiv.append(nombreStrong, detalleDiv);
-
-    const controlesDiv = document.createElement("div");
-    controlesDiv.className = "carrito-controles";
-
-    const btnRestar = document.createElement("button");
-    btnRestar.type = "button";
-    btnRestar.dataset.accion = "restar";
-    btnRestar.dataset.id = String(prod.id);
-    btnRestar.textContent = "-";
-
-    const cantSpan = document.createElement("span");
-    cantSpan.textContent = String(item.cantidad);
-
-    const btnSumar = document.createElement("button");
-    btnSumar.type = "button";
-    btnSumar.dataset.accion = "sumar";
-    btnSumar.dataset.id = String(prod.id);
-    btnSumar.textContent = "+";
-
-    controlesDiv.append(btnRestar, cantSpan, btnSumar);
-    li.append(infoDiv, controlesDiv);
-    listaCarritoEl.append(li);
-  });
-
-  if (carrito.length === 0 || totalUnidades === 0) {
-    const vacioLi = document.createElement("li");
-    vacioLi.className = "carrito-vacio";
-    vacioLi.textContent = "Tu carrito está vacío.";
-    listaCarritoEl.append(vacioLi);
-    limpiarAvisoCarrito();
-  }
-
-  contadorCarritoEl.textContent = String(totalUnidades);
-  cantidadTotalEl.textContent = String(totalUnidades);
-  totalCarritoEl.textContent = formatearSoles(totalMonto);
-}
-
-// Eventos
 contFiltros.addEventListener("click", (e) => {
   const boton = e.target.closest(".filtro");
   if (!boton) return;
@@ -498,22 +250,6 @@ ordenSelect.addEventListener("change", () => renderizarCatalogo());
 chkDisponibles.addEventListener("change", () => renderizarCatalogo());
 
 grilla.addEventListener("click", (e) => {
-  const btnFav = e.target.closest(".btn-favorito");
-  if (btnFav) {
-    e.stopPropagation();
-    const tarjeta = btnFav.closest(".tarjeta");
-    if (tarjeta?.dataset.id) alternarFavorito(tarjeta.dataset.id);
-    return;
-  }
-
-  const btnAdd = e.target.closest(".btn-agregar");
-  if (btnAdd) {
-    e.stopPropagation();
-    const tarjeta = btnAdd.closest(".tarjeta");
-    if (tarjeta?.dataset.id) agregarAlCarrito(tarjeta.dataset.id);
-    return;
-  }
-
   const tarjeta = e.target.closest(".tarjeta");
   if (tarjeta && tarjeta.dataset.id) {
     abrirModal(tarjeta.dataset.id, tarjeta);
@@ -521,7 +257,7 @@ grilla.addEventListener("click", (e) => {
 });
 
 grilla.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && e.target.classList.contains("tarjeta")) {
+  if (e.key === "Enter") {
     const tarjeta = e.target.closest(".tarjeta");
     if (tarjeta && tarjeta.dataset.id) {
       abrirModal(tarjeta.dataset.id, tarjeta);
@@ -529,35 +265,8 @@ grilla.addEventListener("keydown", (e) => {
   }
 });
 
-btnModalFavorito?.addEventListener("click", () => {
-  if (productoModalActualId !== null) {
-    alternarFavorito(productoModalActualId);
-  }
-});
-
 btnCerrarModal.addEventListener("click", cerrarModal);
 modal.addEventListener("cancel", () => cerrarModal());
-
-listaCarritoEl.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-accion]");
-  if (!btn) return;
-  const id = Number(btn.dataset.id);
-  cambiarCantidad(id, btn.dataset.accion === "sumar" ? 1 : -1);
-});
-
-btnAbrirCarrito?.addEventListener("click", () => {
-  panelCarrito.hidden = !panelCarrito.hidden;
-});
-
-btnCerrarCarrito?.addEventListener("click", () => {
-  panelCarrito.hidden = true;
-});
-
-btnVaciarCarrito?.addEventListener("click", () => {
-  carrito = [];
-  guardarCarrito();
-  renderizarCarrito();
-});
 
 async function iniciar() {
   estado.classList.remove("estado--error");
@@ -569,7 +278,6 @@ async function iniciar() {
     renderizarFiltros(categorias);
     sincronizarHash();
     renderizarCatalogo();
-    renderizarCarrito();
   } catch (error) {
     console.error(error);
     estado.classList.add("estado--error");

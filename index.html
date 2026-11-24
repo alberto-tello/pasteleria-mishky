@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastelería Mishky - Catálogo</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <header class="cabecera">
+        <div class="contenedor cabecera_fila">
+            <a href="catalogo.html" class="marca">
+                <img src="img/logo.png" alt="Pastelería Mishky Logo">
+            </a>
+            <nav>
+                <ul class="menu">
+                    <li><a href="catalogo.html" aria-current="page">Catálogo</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="contenedor hero_texto">
+            <p class="hero_antetitulo">Hecho a mano en Cusco desde 2012</p>
+            <h1>Dulces que se recuerdan</h1>
+            <p>Tortas, postres peruanos, panes y galletas horneados cada mañana.</p>
+        </div>
+    </section>
+
+    <main class="contenedor">
+        <h2 class="titulo-seccion">Nuestro catálogo</h2>
+
+        <!-- CONTROLES: Buscador, Ordenamiento y Disponibilidad -->
+        <div class="panel-controles">
+            <div class="control-grupo">
+                <label for="buscador" class="sr-only">Buscar por nombre</label>
+                <input type="search" id="buscador" placeholder="Buscar postre o pan..." autocomplete="off">
+            </div>
+
+            <div class="control-grupo">
+                <label for="orden">Ordenar por:</label>
+                <select id="orden">
+                    <option value="predeterminado">Predeterminado</option>
+                    <option value="precio-asc">Menor precio</option>
+                    <option value="precio-desc">Mayor precio</option>
+                    <option value="nombre-asc">Nombre A–Z</option>
+                </select>
+            </div>
+
+            <div class="control-grupo control-checkbox">
+                <input type="checkbox" id="solo-disponibles">
+                <label for="solo-disponibles">Solo disponibles con stock</label>
+            </div>
+        </div>
+
+        <!-- BOTONES DE FILTRO -->
+        <div id="filtros" class="filtros" role="tablist" aria-label="Categorías de catálogo"></div>
+
+        <!-- ESTADO DE LA INTERFAZ -->
+        <div id="estado" class="estado" role="status" aria-live="polite"></div>
+
+        <!-- GRILLA CON SKELETONS INICIALES -->
+        <ul id="grilla" class="grilla" aria-busy="true">
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+            <li class="tarjeta tarjeta--skeleton" aria-hidden="true">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text corto"></div>
+            </li>
+        </ul>
+    </main>
+
+    <footer id="contacto" class="pie">
+        <div class="contenedor">
+            <p><strong>Pastelería Mishky</strong></p>
+            <p>Av. El Sol 845, Cusco | Pedidos: 984 000 111</p>
+            <p>&copy; 2026 | Proyecto académico | Desarrollo Web I</p>
+        </div>
+    </footer>
+
+    <!-- PLANTILLA DE TARJETA -->
+    <template id="plantilla-tarjeta">
+        <li class="tarjeta">
+            <figure class="tarjeta_foto">
+                <span class="etiqueta" hidden></span>
+                <img src="" alt="" loading="lazy" decoding="async">
+            </figure>
+            <div class="tarjeta_cuerpo">
+                <p class="tarjeta_categoria"></p>
+                <h3 class="tarjeta_nombre"></h3>
+                <p class="tarjeta_descripcion"></p>
+                <div class="tarjeta_pie">
+                    <span class="tarjeta_precio"></span>
+                    <span class="tarjeta_porciones"></span>
+                </div>
+            </div>
+        </li>
+    </template>
+
+    <!-- MODAL DIALOG -->
+    <dialog id="modal-producto" class="modal">
+        <div class="modal_contenido">
+            <button id="btn-cerrar-modal" class="modal_cerrar" aria-label="Cerrar modal">&times;</button>
+            <img id="modal-img" src="" alt="" class="modal_img">
+            <div class="modal_info">
+                <span id="modal-categoria" class="tarjeta_categoria"></span>
+                <h2 id="modal-nombre"></h2>
+                <p id="modal-descripcion"></p>
+                <p id="modal-precio" class="tarjeta_precio"></p>
+                <p id="modal-stock"></p>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="js/catalogo.js"></script>
+</body>
+
+</html>
